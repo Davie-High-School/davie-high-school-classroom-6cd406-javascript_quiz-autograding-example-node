@@ -1,0 +1,54 @@
+name: Autograding Tests
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
+jobs:
+  run-autograding-tests:
+    runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    - name: Test1
+      id: test1
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test1
+        setup-command: npm install
+        command: npm test
+        input: |-
+          Bob
+          world
+        expected-output: |-
+          hello bob
+          hello world
+        comparison-method: contains
+        timeout: 10
+        max-score: 5
+    - name: Test2
+      id: test2
+      uses: classroom-resources/autograding-io-grader@v1
+      with:
+        test-name: Test2
+        setup-command: npm install
+        command: npm test
+        input: |-
+          Bob
+          world
+        expected-output: |-
+          hello bob
+          hello world
+        comparison-method: contains
+        timeout: 10
+        max-score: 5
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1
+      env:
+        TEST1_RESULTS: "${{steps.test1.outputs.result}}"
+        TEST2_RESULTS: "${{steps.test2.outputs.result}}"
+      with:
+        runners: test1,test2
